@@ -1,0 +1,84 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local LocalPlayer = Players.LocalPlayer
+
+-- Удаление старого UI при повторном запуске
+local oldGui = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("MobileControlsUI")
+if oldGui then oldGui:Destroy() end
+
+-- Создание ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MobileControlsUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Вспомогательная функция создания кнопок
+local function createButton(name, text, size, pos, parent)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Text = text
+    btn.Size = size
+    btn.Position = pos
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.BackgroundTransparency = 0.3
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextScaled = true
+    btn.Parent = parent
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0.2, 0)
+    corner.Parent = btn
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Thickness = 1.5
+    stroke.Transparency = 0.5
+    stroke.Parent = btn
+
+    return btn
+end
+
+-- Имитация нажатия клавиш клавиатуры
+local function bindKeyPress(button, keyCode)
+    button.MouseButton1Down:Connect(function()
+        VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+        button.BackgroundTransparency = 0.1
+    end)
+    button.MouseButton1Up:Connect(function()
+        VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+        button.BackgroundTransparency = 0.3
+    end)
+    button.MouseLeave:Connect(function()
+        VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+        button.BackgroundTransparency = 0.3
+    end)
+end
+
+--- === СОЗДАНИЕ КНОПОК ДВИЖЕНИЯ (W, A, S, D) === ---
+
+-- Кнопка Вперед (W)
+local forwardBtn = createButton("ForwardButton", "W", UDim2.new(0, 60, 0, 60), UDim2.new(0.12, 0, 0.45, -70), screenGui)
+bindKeyPress(forwardBtn, Enum.KeyCode.W)
+
+-- Кнопка Назад (S)
+local backwardBtn = createButton("BackwardButton", "S", UDim2.new(0, 60, 0, 60), UDim2.new(0.12, 0, 0.45, 70), screenGui)
+bindKeyPress(backwardBtn, Enum.KeyCode.S)
+
+-- Кнопка Влево (A)
+local leftBtn = createButton("LeftButton", "A", UDim2.new(0, 60, 0, 60), UDim2.new(0.05, 0, 0.45, 0), screenGui)
+bindKeyPress(leftBtn, Enum.KeyCode.A)
+
+-- Кнопка Вправо (D)
+local rightBtn = createButton("RightButton", "D", UDim2.new(0, 60, 0, 60), UDim2.new(0.19, 0, 0.45, 0), screenGui)
+bindKeyPress(rightBtn, Enum.KeyCode.D)
+
+
+--- === КНОПКА ПРЫЖКА === ---
+
+-- Кнопка Прыжка (Space) - расположена справа
+local jumpBtn = createButton("JumpButton", "JUMP", UDim2.new(0, 85, 0, 85), UDim2.new(0.85, 0, 0.55, 0), screenGui)
+bindKeyPress(jumpBtn, Enum.KeyCode.Space)
+
+print("MobileControlsUI (Только WASD + Nhảy) đã sẵn sàng!")
